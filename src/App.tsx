@@ -13,6 +13,7 @@ import {
   Trash2, 
   Edit3, 
   X, 
+  Menu,
   Camera,
   Info,
   ChevronRight,
@@ -216,6 +217,7 @@ export default function App() {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<Student | Teacher | null>(null);
   const [selectedItem, setSelectedItem] = useState<Student | Teacher | null>(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const safeSave = (key: string, value: any) => {
     try {
@@ -434,15 +436,15 @@ export default function App() {
     <div className="min-h-screen bg-[#FDFCFB] font-sans text-gray-900 transition-colors duration-500">
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 glass-morphism py-4 px-6 md:px-12 flex justify-between items-center shadow-sm">
-        <div className="flex items-center gap-2 cursor-pointer" onClick={() => setViewMode('home')}>
+        <div className="flex items-center gap-2 cursor-pointer" onClick={() => { setViewMode('home'); setIsMenuOpen(false); }}>
           <div className={`flex items-center justify-center ${!settings.collegeLogo ? 'bg-indigo-600 p-2 rounded-xl text-white' : ''}`}>
             {settings.collegeLogo ? (
-              <img src={settings.collegeLogo} alt="Logo" className="h-10 w-auto object-contain" referrerPolicy="no-referrer" />
+              <img src={settings.collegeLogo} alt="Logo" className="h-8 md:h-10 w-auto object-contain" referrerPolicy="no-referrer" />
             ) : (
-              <GraduationCap size={24} />
+              <GraduationCap size={20} />
             )}
           </div>
-          <span className="text-xl font-display font-bold tracking-tight text-indigo-950">{settings.collegeName}</span>
+          <span className="text-lg md:text-xl font-display font-bold tracking-tight text-indigo-950 truncate max-w-[150px] md:max-w-none">{settings.collegeName}</span>
         </div>
         
         <div className="hidden lg:flex items-center gap-8 text-sm font-bold">
@@ -472,20 +474,20 @@ export default function App() {
           </button>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
           <button 
             onClick={toggleLanguage}
-            className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full text-indigo-600 transition-all flex items-center gap-2 px-4"
+            className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full text-indigo-600 transition-all flex items-center gap-2 px-3 md:px-4"
           >
-            <Globe size={18} />
-            <span className="text-xs font-bold uppercase">{lang === 'bn' ? 'English' : 'বাংলা'}</span>
+            <Globe size={16} />
+            <span className="text-[10px] md:text-xs font-bold uppercase">{lang === 'bn' ? 'English' : 'বাংলা'}</span>
           </button>
           
           {user ? (
             <div className="relative">
               <button 
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="flex items-center gap-2 bg-white border border-gray-200 p-1 pr-4 rounded-full hover:bg-gray-50 transition-all shadow-sm"
+                className="flex items-center gap-2 bg-white border border-gray-200 p-1 pr-2 md:pr-4 rounded-full hover:bg-gray-50 transition-all shadow-sm"
               >
                 <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-sm">
                   {user.name.charAt(0)}
@@ -504,10 +506,10 @@ export default function App() {
                       initial={{ opacity: 0, y: 10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-50"
+                      className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-50 overflow-hidden"
                     >
                       <button 
-                        onClick={() => { setViewMode('dashboard'); setIsProfileOpen(false); }}
+                        onClick={() => { setViewMode('dashboard'); setIsProfileOpen(false); setIsMenuOpen(false); }}
                         className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
                       >
                         <LayoutDashboard size={18}/>
@@ -529,14 +531,61 @@ export default function App() {
           ) : (
             <button 
               onClick={() => setIsLoginModalOpen(true)}
-              className="flex items-center gap-2 bg-white border border-gray-200 px-5 py-2 rounded-full text-sm font-bold text-gray-700 hover:bg-gray-50 transition-all shadow-sm"
+              className="flex items-center gap-2 bg-white border border-gray-200 px-3 md:px-5 py-2 rounded-full text-xs md:text-sm font-bold text-gray-700 hover:bg-gray-50 transition-all shadow-sm"
             >
               <LogIn size={18} className="text-indigo-600"/>
-              {t.login}
+              <span className="hidden sm:inline">{t.login}</span>
             </button>
           )}
+
+          {/* Mobile Toggle */}
+          <button 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="lg:hidden p-2 text-indigo-950 hover:bg-gray-100 rounded-xl transition-all"
+          >
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
         </div>
       </nav>
+
+      {/* Mobile Drawer Menu */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="lg:hidden fixed top-[72px] left-0 right-0 z-[60] bg-white border-b border-gray-100 shadow-2xl overflow-hidden"
+          >
+            <div className="flex flex-col p-6 gap-2">
+              <button 
+                onClick={() => { setViewMode('home'); setIsMenuOpen(false); }}
+                className={`flex items-center gap-4 p-4 rounded-2xl font-bold transition-all ${viewMode === 'home' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-gray-600 hover:bg-gray-50'}`}
+              >
+                <Home size={20} /> {t.home}
+              </button>
+              <button 
+                onClick={() => { setViewMode('students'); setIsMenuOpen(false); }}
+                className={`flex items-center gap-4 p-4 rounded-2xl font-bold transition-all ${viewMode === 'students' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-gray-600 hover:bg-gray-50'}`}
+              >
+                <Users size={20} /> {t.studentMenu}
+              </button>
+              <button 
+                onClick={() => { setViewMode('teachers'); setIsMenuOpen(false); }}
+                className={`flex items-center gap-4 p-4 rounded-2xl font-bold transition-all ${viewMode === 'teachers' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-gray-600 hover:bg-gray-50'}`}
+              >
+                <BookOpen size={20} /> {t.teacherMenu}
+              </button>
+              <button 
+                onClick={() => { setViewMode('about'); setIsMenuOpen(false); }}
+                className={`flex items-center gap-4 p-4 rounded-2xl font-bold transition-all ${viewMode === 'about' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-gray-600 hover:bg-gray-50'}`}
+              >
+                <Info size={20} /> {t.about}
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Hero Section - Only on Home */}
       <AnimatePresence>
@@ -1094,7 +1143,7 @@ export default function App() {
       {/* Detail Modal */}
       <AnimatePresence>
         {isDetailOpen && selectedItem && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-6 lg:p-24">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 lg:p-24">
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -1294,7 +1343,7 @@ function Modal({ isOpen, onClose, title, children }: ModalProps) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 overflow-y-auto">
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
