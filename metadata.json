@@ -1,0 +1,6 @@
+{
+  "name": "Smart College Connect",
+  "description": "A comprehensive student and teacher management dashboard with a modern UI for diploma projects.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": []
+}
